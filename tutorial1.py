@@ -4,6 +4,9 @@ import tensorflow as tf
 print("using tf verion : ", tf.__version__)
 
 
+
+
+#============== The Dataset Import MNIST
 from tensorflow.keras.datasets import mnist
 (x_train, y_train),(x_test, y_test) = mnist.load_data() # this is a helper function that returns train and text data
 '''
@@ -12,6 +15,9 @@ train set= data to train the nn
 test set = to validate the perfomace of the nn
 '''
 
+
+
+#============== Shapes of Imported Arrays
 print("x_train shape: {} \ny_train shape {}\nx_text shape: {}\ny_train shape: {}".format(
     x_train.shape, y_train.shape, x_test.shape, y_test.shape))
 
@@ -24,9 +30,35 @@ y_train shape: (10000,)
 
 '''
 
+
+#============= Plot an Image Example
+
 from matplotlib import pyplot as plt
+#%matplotlib inline
 plt.imshow(x_train[0], cmap='binary')
 plt.show()
+
+
+#========= Display Labels
+y_train[0]
+
+'''
+the unique values 
+'''
+print(set(y_train))
+
+
+
+
+#=============One Hot Encoding
+'''
+fter this encoding, every label 
+will be converted to a list with 10 elements and the 
+element at index to the corresponding class will be set to 1, rest will be set to 0
+'''
+
+
+#============Encoding Labels
 
 from tensorflow.keras.utils import to_categorical
 
@@ -34,6 +66,11 @@ y_train_encoded = to_categorical(y_train)
 y_test_encoded = to_categorical(y_test)
 
 
+
+
+
+
+#=============== Validated Shapes
 '''
 to make sure the encoding worksits now a 10 dimensional vector
 '''
@@ -46,6 +83,19 @@ y_test_encoded shape: (10000, 10)
 now each eaample is s 10-d vector
 think if it like a switch.. it knows which one is on / off 
 '''
+
+#========== Display Encoded Labels
+y_train_encoded[0]
+
+
+
+
+
+#============Neural Networks
+
+
+
+#=============== Preprocessing the Examples Unrolling N-dimensional Arrays to Vectors
 
 
 '''
@@ -64,6 +114,19 @@ x_train_reshaped.shape, x_test_reshaped.shape))
 
 
 
+#=======Display Pixel Values
+
+#x_train_reshaped[0]
+print(set(x_train_reshaped[0])) # printing the unique values
+
+'''
+that is how pixel values are 0 - 255
+'''
+
+
+#========= Data Normalisation
+
+
 x_mean = np.mean(x_train_reshaped)
 x_std = np.std(x_train_reshaped) # standard deviation
 
@@ -75,16 +138,17 @@ x_test_norm = (x_test_reshaped - x_mean) / (x_std + epsilon)
 
 
 
+#============Display Normalized Pixel Values
+
 print(set(x_train_norm[0]))
 '''
 they are small values now
 '''
 
 
-'''
-Task 6: Creating a Model
-Creating the Model
-'''
+
+
+#======================Creating a Model Creating the Model
 
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
@@ -116,6 +180,8 @@ model = Sequential([
 ])
 
 
+#Activation fnx = give model flexibility = helps you to find non linear patterns in the data
+
 #=============== Compiling the model
 
 
@@ -136,4 +202,93 @@ model.compile(
 
 model.summary() # will display the architecture of the model
 
+
+#=============== training the model
+
+'''
+
+'''
+
+model.fit(x_train_norm, y_train_encoded, epochs=3)
+
+
+
+#========================== evaluate the model
+'''
+we should know if it has understood the nderlying fnx
+
+'''
+
+loss, accuracy = model.evaluate(x_test_norm, y_test_encoded)
+
+'''
+it uses the model state as it is
+does a forward pass to understand the predictions
+the accuracy should be higher for us in this case than the last epoch computed accuracy
+
+'''
+
+print("test set accuracy = ", accuracy*100)
+'''
+test set accuracy =  96.05000019073486
+it is not significantly lower = successful
+'''
+
+
+
+#====================== prediction on test set
+
+preds = model.predict(x_test_norm)
+
+print('shape of preds: ', preds.shape)
+
+
+
+#=============== plotting the result
+'''
+only 25 of them
+'''
+
+
+plt.figure(figsize=(12, 12))
+
+start_index = 0
+
+for i in range(25):
+    plt.subplot(5,5, i+1)
+    plt.grid(False)
+    plt.xticks([])
+    plt.yticks([])
+    
+    pred = np.argmax(preds[start_index+i])
+    gt = y_test[start_index+i]
+    
+    col = 'g'
+    if pred!= gt:
+        col = 'r'
+        
+    plt.xlabel('i={}, pred={}, gt={}'.format(
+        start_index+i, pred, gt
+    ), color=col)
+    
+    plt.imshow(x_test[start_index+i], cmap='binary')
+plt.show()
+
+
+
+
+
+#============== plotting the inaccuracte predicted value
+
+'''
+take a look at the prediction that wasn't accurate
+for me it was index 8
+'''
+
+plt.plot(preds[8])
+plt.show()
+
+'''
+you will see the softmax probability output
+'''
 
