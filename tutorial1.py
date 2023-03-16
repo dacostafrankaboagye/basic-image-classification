@@ -71,3 +71,69 @@ epsilon = 1e-10  # a very small value constant
 
 x_train_norm = (x_train_reshaped - x_mean) / (x_std + epsilon)
 x_test_norm = (x_test_reshaped - x_mean) / (x_std + epsilon)
+
+
+
+
+print(set(x_train_norm[0]))
+'''
+they are small values now
+'''
+
+
+'''
+Task 6: Creating a Model
+Creating the Model
+'''
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+
+
+'''
+using the sequential class to create the model
+- we pass in a list of layers
+
+with sequential class, your input layer
+is your input examples - you donot define it separately
+but let it correspond to the input shape
+- the output of one layer is the input to the next layer
+- you can change the number of nodes
+ - or add more layers
+ 
+ think of computaion power
+ 
+define which algorithm it should use to optimise the w and b
+
+
+'''
+
+model = Sequential([
+    Dense(128, activation='relu', input_shape=(784,)),
+    Dense(128, activation='relu'),
+    Dense(10, activation='softmax')
+    
+])
+
+
+#=============== Compiling the model
+
+
+'''
+
+optimizer fnx, loss fnx, 
+sgd=stochastic gradient descent
+'categorical_crossentropy' = like the difference btn actual ouput and predicted output
+it needs to be minimised
+
+'''
+
+model.compile(
+    optimizer='sgd',
+    loss = 'categorical_crossentropy',
+    metrics = ['accuracy']
+)
+
+model.summary() # will display the architecture of the model
+
+
